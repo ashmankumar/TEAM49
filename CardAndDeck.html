@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <title>ENG1003 Prac Week 6 - Card and Deck</title>
+    <style>
+        #outputArea {
+            padding: .25em;
+            border: solid black 2px;
+            margin: 2em;
+            margin-bottom: 1em;
+            
+            height: 20em;
+            width: 40em;
+            
+            overflow-y: scroll;
+            
+            font-family: consolas, 'courier new', monospace;
+            font-size: 1em;
+            color: rgb(50, 50, 250);
+            
+            background-color: rgb(225,225,225) ;
+        }
+        
+        button, input{
+            margin-top: 1em;
+            margin-left: 3em;
+            width: 30em;
+        }
+        
+    </style>
+
+    </head>
+    
+    <body>
+        <div id="outputArea"></div>
+        <div>
+        
+            <div>
+                <button onClick="storeDeckObject()">Store Deck object to Local Storage, clear memory</button>                
+            </div>
+            <div>
+                <button onClick="retrieveDeckObject()">Retrieve Deck object from Local Storage</button>
+            </div>        
+            <div>
+                <button onClick="displayRetrievedDeckObject()">Display Deck object </button>
+            </div>                
+        </div>
+
+        <script>
+
+            // =================================================================
+
+            // Code that runs on page load
+            // ========================================================
+            
+            var DECK_SIZE = 52;
+            var STORAGE_KEY = "ENG1003Prac6Cards";
+    
+            var deckInstance = new Deck();
+            deckInstance.shuffle();
+           
+            // Since both Deck and Card have private data, we're going 
+            // to work with a normal deck object that has the cards 
+            // array as public data.  Extending this exampe to save and
+            // restore a Deck class instance and associated card instances 
+            // is left as an exercise for the reader.
+            var deckObject = {
+                cards: []
+            };
+            while (deckInstance.size() > 0)
+            {
+                deckObject.cards.push(deckInstance.dealCard());
+            }
+ 
+            // Button click event handlers
+            // ========================================================
+            
+            function storeDeckObject()
+            {
+                if (typeof(Storage) !== "undefined")
+                {
+                    // TODO: Stringify deckObject to a JSON string
+                    
+                    // TODO: store this JSON string to local storage 
+                    //       using the key STORAGE_KEY.
+            
+                }
+                else
+                {
+                    console.log("Error: localStorage is not supported by current browser.");
+                }
+                
+                //now clear memory
+                deckObject = null;
+            }
+
+                        
+            function retrieveDeckObject()
+            {
+                if (typeof(Storage) !== "undefined")
+                {
+                    // TODO: Retrieve the stored JSON string and parse 
+                    //       to a variable called publicDataDeckObject.
+            
+                    
+                    deckObject = {
+                        cards: []
+                    };
+                    
+                    for (var i = 0; i < publicDataDeckObject.cards.length; i++)
+                    {
+                        // TODO: Convert the public-data object versions of 
+                        //       cards into Card class instances and insert
+                        //       them in deckObject.cards
+
+                    }
+                }
+                else
+                {
+                    console.log("Error: localStorage is not supported by current browser.");
+                }                
+            
+            }
+            
+            
+            function displayRetrievedDeckObject()
+            {
+                var outputAreaRef = document.getElementById("outputArea");
+                var output = "";
+                
+                if (deckObject)
+                {
+                    for (var i = 0; i < deckObject.cards.length; i++)
+                    {
+                        output += deckObject.cards[i] + "<br/>";
+                    }
+                }
+                else
+                {
+                    output = "Error: Test deck instance not loaded.<br />"
+                }
+                
+                outputAreaRef.innerHTML = output;
+            }            
+            
+
+
+
+            // Class Constructors
+            // ========================================================
+                 
+            // Card class
+            // ----------
+            //
+            function Card(initValue, initSuit)
+            {
+                // Private attributes:
+                
+                var value;    // Integer value 1-13 inclusive
+                var suit;     // Integer value 1-4 inclusive
+                
+                // Private methods:
+                
+                var setSuit = function(newSuit) {
+                    // Ensure that only valid suits are allowed
+                    if (newSuit >= 1 && newSuit <= 4)
+                    {
+                        suit = newSuit;
+                    }
+                    else
+                    {
+                        suit = 0;
+                        console.log("Card: Invalid suit value " + newSuit);
+                    }
+                };
+                
+                var setValue = function(newValue) {
+                    if (newValue >= 1 && newValue <= 13)
+                    {
+                        value = newValue;
+                    }
+                    else
+                    {
+                        value = 0;
+                        console.log("Card: Invalid card value " + newValue);
+                    }
+                };
+
+                // Initialisation
+
+                setValue(initValue);
+                setSuit(initSuit);
+                
+                // Public methods:
+                
+                // Reinitialises this instance from a public-data card object.
+                this.initialiseFromCardPDO = function(cardObject)
+                {
+                    setValue(cardObject.value);
+                    setSuit(cardObject.suit);
+                };
+
+                this.getValue = function() {
+                    return value;
+                };
+                
+                this.getSuit = function() {
+                    return suit;
+                };
+                
+                this.toString = function() {
+                    return "The " + getValueName(value) + " of " + getSuitName(suit);  
+                };
+                
+                this.cardToCardPDO = function() {
+                    var cardObject = {};
+                    
+                    cardObject.value = value;
+                    cardObject.suit = suit;
+                    
+                    return cardObject;
+                }                
+                
+                // Private methods:
+                
+                var getValueName = function(value) {
+                    var valueLookup = ["", "ace", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "jack", "queen", "king" ];
+                    return valueLookup[value];
+                };    
+
+                var getSuitName = function(suit) {
+                    var valueLookup = ["", "clubs", "diamonds", "hearts", "spades"];
+                    return valueLookup[suit];
+                };
+            }    
+
+
+            // Deck class
+            // ----------
+            //
+            function Deck()
+            {
+                // Private attributes:
+                
+                var cards = [];
+
+                // Code to inialise the card array
+                for (var theSuit = 1; theSuit <= 4; theSuit++)
+                {
+                    for (var theValue = 1; theValue <= 13; theValue++)
+                    {
+                        cards.push(new Card(theValue, theSuit));
+                    }
+                }
+
+                // Public methods:
+
+                this.shuffle = function() {
+                    var card2Index;
+                    var tempCard;
+                
+                    // For each card in deck array, swap it with another card
+                    // at a random position in the array.
+                    for (var card1Index = 0; card1Index < cards.length; card1Index++)
+                    {
+                        card2Index = Math.floor(Math.random() * cards.length);
+                        
+                        // Swap 'em
+                        tempCard = cards[card1Index];
+                        cards[card1Index] = cards[card2Index] ;
+                        cards[card2Index] = tempCard;
+                    }
+                };
+
+                this.size = function() {
+                    return cards.length;
+                };
+                
+                // This method should remove the next card from the Deck and 
+                // return it.  If called when the Deck is empty it should
+                // return null.
+                this.dealCard = function() {
+                    var cardToDeal = cards.pop();;
+                    return cardToDeal; 
+                };
+            }
+                
+            // =================================================================
+            
+        </script>
+    </body>
+</html>
